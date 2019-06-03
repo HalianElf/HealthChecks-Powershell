@@ -16,8 +16,8 @@ param(
 	[Switch]$DebugOn = $false
 )
 
-#Set TLS 1.2
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+#Set TLS
+[Net.ServicePointManager]::SecurityProtocol = "Tls12, Tls11, Tls, Ssl3"
 
 # Define variables
 # Primary domain all of your reverse proxies are hosted on
@@ -32,13 +32,12 @@ $primaryServerAddress='172.27.1.132'
 $secondaryServerAddress='172.27.1.9'
 $hcPingDomain='https://hc-ping.com/'
 
-# You will need to adjust the subDomain, appPort, subDir, and hcUUID variables for each application's function according to your setup
-# I've left in some examples to show the expected format.
-
+# Set Debug Preference to Continue if flag is set so there is output to console
 if ($DebugOn) {
 	$DebugPreference = 'Continue'
 }
 
+# Function to do the what a curl -retry does
 function WebRequestRetry() {
     Param(
         [Parameter(Mandatory=$True)]
@@ -81,6 +80,9 @@ function WebRequestRetry() {
     #Write-Host "OK ($($response.StatusCode))"
     return $response
 }
+
+# You will need to adjust the subDomain, appPort, subDir, and hcUUID variables for each application's function according to your setup
+# I've left in some examples to show the expected format.
 
 # Function to check Organizr public Domain
 function check_organizr() {
