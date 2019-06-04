@@ -1,2 +1,26 @@
-# HealthChecks-Powershell
-Script to test various application reverse proxies, as well as their internal pages, and report to their respective Healthchecks.io checks
+# HealthChecks Powershell
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/7099f437569a420187fa22905bed430c)](https://www.codacy.com/app/HalianElf/HealthChecks-Powershell?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=HalianElf/HealthChecks-Powershell&amp;utm_campaign=Badge_Grade)
+[![made-with-powershell](https://img.shields.io/badge/Made%20with-Powershell-1f425f.svg)](https://github.com/PowerShell/PowerShell)
+[![Beerpay](https://beerpay.io/HalianElf/HealthChecks-Powershell/badge.svg?style=flat)](https://beerpay.io/HalianElf/HealthChecks-Powershell)
+
+Script to test various application reverse proxies, as well as their internal pages, and report to their respective [Healthchecks.io](https://healthchecks.io) checks. This is meant to work with [Organizr](https://github.com/causefx/Organizr) Auth, leveraging the API key to check the reverse proxies.
+
+## Setting it up
+
+There are variables at the top that are used throughout the script to do the tests. You'll want to fill in your domain, Organizr API key, and server IP(s). If you are self-hosting Healthchecks, you can change the hcPingDomain variable. You'll also need to go to each of the `check_application` functions and edit the UUID for the Healthcheck and the ports and/or subdomains on those. Lastly, comment out any of the checks you don't need in the main function.
+
+Once you have all of the checks configured as you need, you can run the script with the `-DebugOn` flag to make sure that all the responses are returning what's expected.
+
+Please be warned that by default, Windows Policies are to block any and all scripts that are not made directly on your machine. If you are experiencing this, you can run it using `Powershell.exe -ExecutionPolicy RemoteSigned -File .\application_healthchecks_generic.ps1` to do it just at runtime or use `Set-ExecutionPolicy RemoteSigned` from an Administrator Powershell window to set it permanently.
+
+## Scheduling
+
+Now that you have it so that everything is working properly, you can use Task Scheduler to have it run automatically. When adding a new task, set the action to `Start a program`, choose `Powershell.exe` as the Program/script and use `-ExecutionPolicy RemoteSigned -File C:\Path\To\Script\application_healthchecks_generic.ps1` in the arguments. (Note: if you set the Execution Policy permanently, you won't need the `-ExecutionPolicy` flag)
+
+## Thanks
+
+Big thanks to [christronyxyocum](https://github.com/christronyxyocum) for creating the bash script that this is based off of.
+
+## Questions
+
+If you have any questions, you can find me on the [Organizr Discord](https://organizr.app/discord).
