@@ -13,36 +13,21 @@ param(
 		)
 	]
     [Switch]$DebugOn = $false,
-    [parameter (
-		   Mandatory=$false
-		 , HelpMessage="Enable pause mode"
-		)
-	]
-    [String]$p = $false,
+    [Alias("p")]
     [parameter (
 		   Mandatory=$false
 		 , HelpMessage="Enable pause mode"
 		)
 	]
     [String]$pause = $false,
-    [parameter (
-		   Mandatory=$false
-		 , HelpMessage="Enable unpause mode"
-		)
-	]
-    [String]$u = $false,
+    [Alias("u")]
     [parameter (
 		   Mandatory=$false
 		 , HelpMessage="Enable unpause mode"
 		)
 	]
     [String]$unpause = $false,
-    [parameter (
-		   Mandatory=$false
-		 , HelpMessage="Send status to webhook"
-		)
-	]
-    [Switch]$w = $false,
+    [Alias("w")]
     [parameter (
 		   Mandatory=$false
 		 , HelpMessage="Send status to webhook"
@@ -79,7 +64,7 @@ if (-Not (Test-Path $lockfileDir -PathType Container)) {
 }
 
 # Healthchecks API key
-$hcAPIKey='abc123';
+$hcAPIKey='';
 
 # Set Debug Preference to Continue if flag is set so there is output to console
 if ($DebugOn) {
@@ -153,31 +138,16 @@ function Write-ColorOutput() {
 }
 
 # Set option based on flags, default to ping
-if ((($p -ne $false) -Or ($pause -ne $false)) -And (($u -ne $false) -Or ($unpause -ne $false))) {
+if (($pause -ne $false) -And ($unpause -ne $false)) {
     Write-ColorOutput -ForegroundColor red -MessageData "You can't use both pause and unpause!"
-} elseif (($p -ne $false)-Or ($pause -ne $false)) {
+} elseif ($pause -ne $false) {
     $option = "pause"
-    if ($p -ne $false) {
-        $pauseOption = $p
-    } elseif ($pause -ne $false) {
-        $pauseOption = $pause
-    }
-} elseif (($u -ne $false) -Or ($unpause -ne $false)) {
+} elseif ($unpause -ne $false) {
     $option = "unpause"
-    if ($u -ne $false) {
-        $pauseOption = $u
-    } elseif ($unpause -ne $false) {
-        $pauseOption = $unpause
-    }
-} elseif ($webhook -Or $w) {
+} elseif ($webhook) {
     $option = $null
 } else {
     $option = "ping"
-}
-
-# Set webhook option
-if ($w) {
-    $webhook = $true
 }
 
 # You will need to adjust the subDomain, appPort, subDir, and hcUUID variables for each application's function according to your setup
@@ -231,7 +201,7 @@ function get_checks() {
 }
 
 function pause_checks() {
-    if ($pauseOption -eq "all") {
+    if ($pause -eq "all") {
         foreach ($check in $checks.checks) {
             Write-Information "Pausing $($check.name)"
             try { 
@@ -242,10 +212,10 @@ function pause_checks() {
         }
         New-Item -Path "${lockfileDir}healthchecks.lock" -ItemType File  | Out-Null
     } else {
-        if (-Not ($checks.checks.name -contains $pauseOption)) {
+        if (-Not ($checks.checks.name -contains $pause)) {
             Write-ColorOutput -ForegroundColor red -MessageData "Please make sure you're specifying a valid check and try again."
         } else {
-            $check = $checks.checks.Where({$_.name -eq $pauseOption})
+            $check = $checks.checks.Where({$_.name -eq $pause})
             Write-Information "Pausing $($check.name)"
             try { 
                 Invoke-WebRequest -Method POST -Headers @{"X-Api-Key"="$hcAPIKey";} -Uri $check.pause_url  | Out-Null
@@ -258,7 +228,7 @@ function pause_checks() {
 }
 
 function unpause_checks() {
-    if ($pauseOption -eq "all") {
+    if ($unpause -eq "all") {
         foreach ($check in $checks.checks) {
             Write-Information "Unpausing $($check.name) by sending a ping"
             try { 
@@ -269,10 +239,10 @@ function unpause_checks() {
         }
         Remove-Item -Path "${lockfileDir}healthchecks.lock"  | Out-Null
     } else {
-        if (-Not ($checks.checks.name -contains $pauseOption)) {
+        if (-Not ($checks.checks.name -contains $unpause)) {
             Write-ColorOutput -ForegroundColor red -MessageData "Please make sure you're specifying a valid check and try again."
         } else {
-            $check = $checks.checks.Where({$_.name -eq $pauseOption})
+            $check = $checks.checks.Where({$_.name -eq $unpause})
             Write-Information "Unpausing $($check.name) by sending a ping"
             try { 
                 Invoke-WebRequest -Uri $check.ping_url  | Out-Null
