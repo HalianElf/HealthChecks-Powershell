@@ -191,7 +191,7 @@ function check_api_key() {
         if ($hcAPIKey -eq "") {
             Write-ColorOutput -ForegroundColor red -MessageData "You didn't define your HealthChecks API key in the script!"
             Write-Information ""
-            $ans = Read-Host "Enter your API key: "
+            $ans = Read-Host "Enter your API key"
             Write-Information ""
             (Get-Content $MyInvocation.ScriptName) -replace "^\`$hcAPIKey=''", "`$hcAPIKey='${ans}'" | Set-Content $MyInvocation.ScriptName
             $hcAPIKey=$ans
@@ -206,6 +206,17 @@ function check_api_key() {
                 $hcAPIKey=""
             }
         }
+    }
+}
+
+function check_webhookurl() {
+    if (($webhookUrl -eq '') -And ($webhook)) {
+        Write-ColorOutput -ForegroundColor red -MessageData "You didn't define your Discord webhook URL!"
+        Write-Information ""
+        $ans = Read-Host "Enter your webhook URL"
+        Write-Information ""
+        (Get-Content $MyInvocation.ScriptName) -replace "^\`$webhookUrl=''", "`$webhookUrl='${ans}'" | Set-Content $MyInvocation.ScriptName
+        $script:webhookUrl=$ans
     }
 }
 
@@ -1019,6 +1030,7 @@ function check_tautulli() {
 }
 
 function main() {
+    check_webhookurl
     if ($option -eq "pause") {
         check_api_key
         get_checks
@@ -1052,6 +1064,7 @@ function main() {
         check_tautulli
     }
     if ($webhook) {
+        check_api_key
         get_checks
         send_webhook
     }
