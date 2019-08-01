@@ -313,20 +313,28 @@ function check_organizr() {
     } else {
         Write-Debug "Organizr External"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "https://${domain}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $extResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $extResponse"
+        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         Write-Debug "Organizr Internal"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $intResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $intResponse"
+        if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
             (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
         } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
@@ -346,20 +354,28 @@ function check_bitwarden() {
     } else {
         Write-Debug "Bitwarden External"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "https://${subdomain}.${domain}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "https://${subdomain}.${domain}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $extResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $extResponse"
+        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         Write-Debug "Bitwarden Internal"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $intResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $intResponse"
+        if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
             (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
         } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
@@ -379,20 +395,28 @@ function check_deluge() {
     } else {
         Write-Debug "Guacamole External"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $extResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $extResponse"
+        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         Write-Debug "Guacamole Internal"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $intResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $intResponse"
+        if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
             (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
         } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
@@ -413,20 +437,28 @@ function check_gitlab() {
     } else {
         Write-Debug "Gitlab External"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "https://${subdomain}.${domain}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "https://${subdomain}.${domain}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $extResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $extResponse"
+        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         Write-Debug "Gitlab Internal"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $intResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $intResponse"
+        if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
             (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
         } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
@@ -446,19 +478,27 @@ function check_grafana() {
     } else {
         Write-Debug "Grafana External"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "https://${subdomain}.${domain}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "https://${subdomain}.${domain}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $extResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $extResponse"
+        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         Write-Debug "Grafana Internal"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}/login" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}/login" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $intResponse=[int]$response.BaseResponse.StatusCode
+        if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         Write-Debug "Response: $intResponse"
         if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
             (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
@@ -479,20 +519,28 @@ function check_guacamole() {
     } else {
         Write-Debug "Guacamole External"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $extResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $extResponse"
+        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         Write-Debug "Guacamole Internal"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $intResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $intResponse"
+        if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
             (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
         } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
@@ -512,20 +560,28 @@ function check_jackett() {
     } else {
         Write-Debug "Jackett External"
         $response = try {
-            Invoke-WebRequest -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $extResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $extResponse"
+        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         Write-Debug "Jackett Internal"
         $response = try {
-            Invoke-WebRequest -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $intResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $intResponse"
+        if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
             (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
         } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
@@ -545,20 +601,28 @@ function check_library() {
     } else {
         Write-Debug "PLPP External"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "https://${subdomain}.${domain}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "https://${subdomain}.${domain}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $extResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $extResponse"
+        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         Write-Debug "PLPP Internal"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $intResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $intResponse"
+        if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
             (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
         } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
@@ -578,20 +642,28 @@ function check_lidarr() {
     } else {
         Write-Debug "Lidarr External"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $extResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $extResponse"
+        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         Write-Debug "Lidarr Internal"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $intResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $intResponse"
+        if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
             (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
         } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
@@ -611,20 +683,28 @@ function check_logarr() {
     } else {
         Write-Debug "Logarr External"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $extResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $extResponse"
+        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         Write-Debug "Logarr Internal"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $intResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $intResponse"
+        if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
             (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
         } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
@@ -644,20 +724,28 @@ function check_monitorr() {
     } else {
         Write-Debug "Monitorr External"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $extResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $extResponse"
+        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         Write-Debug "Monitorr Internal"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $intResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $intResponse"
+        if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
             (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
         } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
@@ -677,20 +765,28 @@ function check_nzbget() {
     } else {
         Write-Debug "NZBGet External"
         $response = try {
-            Invoke-WebRequest -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $extResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $extResponse"
+        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         Write-Debug "NZBGet Internal"
         $response = try {
-            Invoke-WebRequest -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $intResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $intResponse"
+        if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
             (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
         } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
@@ -710,20 +806,28 @@ function check_nzbhydra() {
     } else {
         Write-Debug "NZBHydra External"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $extResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $extResponse"
+        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         Write-Debug "NZBHydra Internal"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $intResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $intResponse"
+        if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
             (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
         } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
@@ -743,20 +847,28 @@ function check_ombi() {
     } else {
         Write-Debug "Ombi External"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $extResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $extResponse"
+        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         Write-Debug "Ombi Internal"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $intResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $intResponse"
+        if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
             (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
         } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
@@ -776,20 +888,28 @@ function check_pihole() {
     } else {
         Write-Debug "PiHole External"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "https://${subDomain}.${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "https://${subDomain}.${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $extResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $extResponse"
+        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         Write-Debug "PiHole Internal"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "http://${secondaryServerAddress}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "http://${secondaryServerAddress}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $intResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $intResponse"
+        if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
             (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
         } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
@@ -809,20 +929,28 @@ function check_plex() {
     } else {
         Write-Debug "Plex External"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}web/index.html" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}web/index.html" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $extResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $extResponse"
+        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         Write-Debug "Plex Internal"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}/web/index.html" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}/web/index.html" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $intResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $intResponse"
+        if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
             (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
         } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
@@ -842,20 +970,28 @@ function check_portainer() {
     } else {
         Write-Debug "Portainer External"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $extResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $extResponse"
+        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         Write-Debug "Portainer Internal"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $intResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $intResponse"
+        if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
             (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
         } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
@@ -875,20 +1011,28 @@ function check_radarr() {
     } else {
         Write-Debug "Radarr External"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $extResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $extResponse"
+        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         Write-Debug "Radarr Internal"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $intResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $intResponse"
+        if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
             (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
         } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
@@ -908,20 +1052,28 @@ function check_rutorrent() {
     } else {
         Write-Debug "ruTorrent External"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $extResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $extResponse"
+        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         Write-Debug "ruTorrent Internal"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $intResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $intResponse"
+        if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
             (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
         } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
@@ -941,20 +1093,28 @@ function check_sabnzbd() {
     } else {
         Write-Debug "SABnzbd External"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $extResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $extResponse"
+        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         Write-Debug "SABnzbd Internal"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $intResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $intResponse"
+        if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
             (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
         } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
@@ -974,20 +1134,28 @@ function check_sonarr() {
     } else {
         Write-Debug "Sonarr External"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $extResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $extResponse"
+        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         Write-Debug "Sonarr Internal"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $intResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $intResponse"
+        if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
             (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
         } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
@@ -1007,20 +1175,28 @@ function check_tautulli() {
     } else {
         Write-Debug "Tautulli External"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $extResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $extResponse"
+        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         Write-Debug "Tautulli Internal"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
         $intResponse=[int]$response.BaseResponse.StatusCode
         Write-Debug "Response: $intResponse"
+        if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
         if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
             (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
         } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
