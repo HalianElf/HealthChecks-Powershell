@@ -9,7 +9,6 @@ using namespace System.Management.Automation
 param(
 	[parameter (
 		   Mandatory=$false
-		 , position=0
 		 , HelpMessage="Enable debug output"
 		)
 	]
@@ -1165,6 +1164,47 @@ function check_sonarr() {
 }
 
 # Function to check Tautulli
+function check_tautulli() {
+    $appPort='8181'
+    $subDir='/tautulli/auth/login'
+    $hcUUID=''
+    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
+    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+        Write-Debug "Tautulli is paused"
+    } else {
+        Write-Debug "Tautulli External"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $extResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $extResponse"
+        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
+        Write-Debug "Tautulli Internal"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $intResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $intResponse"
+        if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
+            $loc = $response.Headers.Location
+            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
+        }
+        if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
+        } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+        }
+    }
+}
+
+# Function to check Transmission
 function check_tautulli() {
     $appPort='8181'
     $subDir='/tautulli/auth/login'
