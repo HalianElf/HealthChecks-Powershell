@@ -40,16 +40,16 @@ param(
     [String]$unpause = $false,
     [parameter (
 		   Mandatory=$false
-		 , HelpMessage="Enable unpause mode"
+		 , HelpMessage="Send status to webhook"
 		)
 	]
     [Switch]$w = $false,
     [parameter (
 		   Mandatory=$false
-		 , HelpMessage="Enable unpause mode"
+		 , HelpMessage="Send status to webhook"
 		)
 	]
-    [Switch]$webhook = $false 
+    [Switch]$webhook = $false
 )
 
 #Set TLS
@@ -170,6 +170,8 @@ if ((($p -ne $false) -Or ($pause -ne $false)) -And (($u -ne $false) -Or ($unpaus
     } elseif ($unpause -ne $false) {
         $pauseOption = $unpause
     }
+} elseif ($webhook -Or $w) {
+    $option = $null
 } else {
     $option = "ping"
 }
