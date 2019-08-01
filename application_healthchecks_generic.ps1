@@ -1205,15 +1205,15 @@ function check_tautulli() {
 }
 
 # Function to check Transmission
-function check_tautulli() {
-    $appPort='8181'
-    $subDir='/tautulli/auth/login'
+function check_transmission() {
+    $appPort='9091'
+    $subDir='/transmission/web/index.html'
     $hcUUID=''
     $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
     if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
-        Write-Debug "Tautulli is paused"
+        Write-Debug "Transmission is paused"
     } else {
-        Write-Debug "Tautulli External"
+        Write-Debug "Transmission External"
         $response = try {
             Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
@@ -1225,7 +1225,7 @@ function check_tautulli() {
             $loc = $response.Headers.Location
             Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
         }
-        Write-Debug "Tautulli Internal"
+        Write-Debug "Transmission Internal"
         $response = try {
             Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
