@@ -186,7 +186,7 @@ if ($w) {
 
 # Function to check if the HC API key is good
 function check_api_key() {
-    $apiKeyValid = $true
+    $apiKeyValid = $false
     while (-Not ($apiKeyValid)) {
         if ($hcAPIKey -eq "") {
             Write-ColorOutput -ForegroundColor red -MessageData "You didn't define your HealthChecks API key in the script!"
