@@ -208,6 +208,7 @@ function check_api_key() {
 }
 
 function get_checks() {
+    $script:checks=""
     try {
         $script:checks = Invoke-WebRequest -Headers @{"X-Api-Key"="$hcAPIKey";} -Uri "${hcAPIDomain}checks/"
         $script:checks = $checks | ConvertFrom-Json
@@ -268,6 +269,24 @@ function unpause_checks() {
             }
             Remove-Item -Path "${lockfileDir}$($check.name).lock"  | Out-Null
         }
+    }
+}
+
+function send_webhook() {
+    $pausedCount = 0
+    $pausedChecks='"fields": ['
+    foreach ($check in $checks.checks) {
+        if ($check.status -eq "paused") {
+            $pausedCount++
+            $pausedChecks+="{`"name`": `"$($check.name)`", `"value`": `"$(($check.ping_url).Split("/")[3])`"},"
+        }
+    }
+    $pausedChecks=$pausedChecks.Substring(0,$pausedChecks.length-1)
+    $pausedChecks+="]"
+    if ($pausedCount -ge 1) {
+        Invoke-WebRequest -Method POST -Headers @{"Content-Type"="application/json";} -Body "{`"embeds`": [{ `"title`": `"There are currently paused HealthChecks.io monitors:`",`"color`": 3381759, ${pausedChecks}}]}" -Uri ${webhookUrl}  | Out-Null
+    } else {
+        Invoke-WebRequest -Method POST -Headers @{"Content-Type"="application/json";} -Body '{"embeds": [{ "title": "All HealthChecks.io monitors are currently running.","color": 10092339}]}' -Uri ${webhookUrl} | Out-Null
     }
 }
 
@@ -1007,28 +1026,32 @@ function main() {
         get_checks
         unpause_checks
     } elseif ($option -eq "ping") {
-        check_organizr
-        check_bitwarden
-        check_deluge
-        check_gitlab
-        check_grafana
-        check_guacamole
-        check_jackett
-        check_library
-        check_lidarr
-        check_logarr
-        check_monitorr
-        check_nzbget
-        check_nzbhydra
-        check_ombi
-        check_pihole
-        check_plex
-        check_portainer
-        check_radarr
-        check_rutorrent
-        check_sabnzbd
-        check_sonarr
-        check_tautulli
+        #check_organizr
+        #check_bitwarden
+        #check_deluge
+        #check_gitlab
+        #check_grafana
+        #check_guacamole
+        #check_jackett
+        #check_library
+        #check_lidarr
+        #check_logarr
+        #check_monitorr
+        #check_nzbget
+        #check_nzbhydra
+        #check_ombi
+        #check_pihole
+        #check_plex
+        #check_portainer
+        #check_radarr
+        #check_rutorrent
+        #check_sabnzbd
+        #check_sonarr
+        #check_tautulli
+    }
+    if ($webhook) {
+        get_checks
+        send_webhook
     }
 }
 
