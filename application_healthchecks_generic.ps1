@@ -275,26 +275,31 @@ function unpause_checks() {
 function check_organizr() {
     $appPort='4080'
     $hcUUID=''
-    Write-Debug "Organizr External"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "https://${domain}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $extResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $extResponse"
-    Write-Debug "Organizr Internal"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $intResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $intResponse"
-    if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
-    } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
+    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+        Write-Debug "Organizr is paused"
+    } else {
+        Write-Debug "Organizr External"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $extResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $extResponse"
+        Write-Debug "Organizr Internal"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $intResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $intResponse"
+        if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
+        } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+        }
     }
 }
 
@@ -303,26 +308,31 @@ function check_bitwarden() {
     $subDomain='bitwarden'
     $appPort='8484'
     $hcUUID=''
-    Write-Debug "Bitwarden External"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "https://${subdomain}.${domain}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $extResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $extResponse"
-    Write-Debug "Bitwarden Internal"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $intResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $intResponse"
-    if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
-    } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
+    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+        Write-Debug "Bitwarden is paused"
+    } else {
+        Write-Debug "Bitwarden External"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "https://${subdomain}.${domain}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $extResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $extResponse"
+        Write-Debug "Bitwarden Internal"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $intResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $intResponse"
+        if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
+        } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+        }
     }
 }
 
@@ -331,26 +341,31 @@ function check_deluge() {
     $appPort='8112'
     $subDir='/deluge/'
     $hcUUID=''
-    Write-Debug "Guacamole External"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $extResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $extResponse"
-    Write-Debug "Guacamole Internal"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $intResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $intResponse"
-    if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
-    } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
+    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+        Write-Debug "Deluge is paused"
+    } else {
+        Write-Debug "Guacamole External"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $extResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $extResponse"
+        Write-Debug "Guacamole Internal"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $intResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $intResponse"
+        if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
+        } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+        }
     }
 }
 
@@ -360,26 +375,31 @@ function check_gitlab() {
     $appPort='8081'
     $subDir='/users/sign_in'
     $hcUUID=''
-    Write-Debug "Gitlab External"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "https://${subdomain}.${domain}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $extResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $extResponse"
-    Write-Debug "Gitlab Internal"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $intResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $intResponse"
-    if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
-    } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
+    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+        Write-Debug "Gitlab is paused"
+    } else {
+        Write-Debug "Gitlab External"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "https://${subdomain}.${domain}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $extResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $extResponse"
+        Write-Debug "Gitlab Internal"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $intResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $intResponse"
+        if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
+        } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+        }
     }
 }
 
@@ -388,26 +408,31 @@ function check_grafana() {
     $subDomain='grafana'
     $appPort='3000'
     $hcUUID=''
-    Write-Debug "Grafana External"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "https://${subdomain}.${domain}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $extResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $extResponse"
-    Write-Debug "Grafana Internal"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}/login" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $intResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $intResponse"
-    if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
-    } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
+    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+        Write-Debug "Grafana is paused"
+    } else {
+        Write-Debug "Grafana External"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "https://${subdomain}.${domain}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $extResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $extResponse"
+        Write-Debug "Grafana Internal"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}/login" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $intResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $intResponse"
+        if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
+        } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+        }
     }
 }
 
@@ -416,26 +441,31 @@ function check_guacamole() {
     $appPort=''
     $subDir='/guac/'
     $hcUUID=''
-    Write-Debug "Guacamole External"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $extResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $extResponse"
-    Write-Debug "Guacamole Internal"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $intResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $intResponse"
-    if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
-    } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
+    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+        Write-Debug "Guacamole is paused"
+    } else {
+        Write-Debug "Guacamole External"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $extResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $extResponse"
+        Write-Debug "Guacamole Internal"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $intResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $intResponse"
+        if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
+        } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+        }
     }
 }
 
@@ -444,26 +474,31 @@ function check_jackett() {
     $appPort='9117'
     $subDir='/jackett/UI/Login'
     $hcUUID=''
-    Write-Debug "Jackett External"
-    $response = try {
-        Invoke-WebRequest -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $extResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $extResponse"
-    Write-Debug "Jackett Internal"
-    $response = try {
-        Invoke-WebRequest -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $intResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $intResponse"
-    if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
-    } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
+    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+        Write-Debug "Jackett is paused"
+    } else {
+        Write-Debug "Jackett External"
+        $response = try {
+            Invoke-WebRequest -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $extResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $extResponse"
+        Write-Debug "Jackett Internal"
+        $response = try {
+            Invoke-WebRequest -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $intResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $intResponse"
+        if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
+        } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+        }
     }
 }
 
@@ -472,26 +507,31 @@ function check_library() {
     $subDomain='library'
     $appPort='8383'
     $hcUUID=''
-    Write-Debug "PLPP External"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "https://${subdomain}.${domain}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $extResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $extResponse"
-    Write-Debug "PLPP Internal"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $intResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $intResponse"
-    if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
-    } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
+    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+        Write-Debug "PLPP is paused"
+    } else {
+        Write-Debug "PLPP External"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "https://${subdomain}.${domain}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $extResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $extResponse"
+        Write-Debug "PLPP Internal"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $intResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $intResponse"
+        if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
+        } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+        }
     }
 }
 
@@ -500,26 +540,31 @@ function check_lidarr() {
     $appPort='8686'
     $subDir='/lidarr/'
     $hcUUID=''
-    Write-Debug "Lidarr External"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $extResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $extResponse"
-    Write-Debug "Lidarr Internal"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $intResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $intResponse"
-    if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
-    } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
+    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+        Write-Debug "Lidarr is paused"
+    } else {
+        Write-Debug "Lidarr External"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $extResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $extResponse"
+        Write-Debug "Lidarr Internal"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $intResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $intResponse"
+        if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
+        } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+        }
     }
 }
 
@@ -528,26 +573,31 @@ function check_logarr() {
     $appPort='8000'
     $subDir='/logarr/'
     $hcUUID=''
-    Write-Debug "Logarr External"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $extResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $extResponse"
-    Write-Debug "Logarr Internal"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $intResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $intResponse"
-    if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
-    } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
+    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+        Write-Debug "Logarr is paused"
+    } else {
+        Write-Debug "Logarr External"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $extResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $extResponse"
+        Write-Debug "Logarr Internal"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $intResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $intResponse"
+        if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
+        } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+        }
     }
 }
 
@@ -556,26 +606,31 @@ function check_monitorr() {
     $appPort='8001'
     $subDir='/monitorr/'
     $hcUUID=''
-    Write-Debug "Monitorr External"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $extResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $extResponse"
-    Write-Debug "Monitorr Internal"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $intResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $intResponse"
-    if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
-    } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
+    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+        Write-Debug "Monitorr is paused"
+    } else {
+        Write-Debug "Monitorr External"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $extResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $extResponse"
+        Write-Debug "Monitorr Internal"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $intResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $intResponse"
+        if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
+        } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+        }
     }
 }
 
@@ -584,54 +639,64 @@ function check_nzbget() {
     $appPort='6789'
     $subDir='/nzbget/'
     $hcUUID=''
-    Write-Debug "NZBGet External"
-    $response = try {
-        Invoke-WebRequest -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $extResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $extResponse"
-    Write-Debug "NZBGet Internal"
-    $response = try {
-        Invoke-WebRequest -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $intResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $intResponse"
-    if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
-    } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
+    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+        Write-Debug "NZBGet is paused"
+    } else {
+        Write-Debug "NZBGet External"
+        $response = try {
+            Invoke-WebRequest -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $extResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $extResponse"
+        Write-Debug "NZBGet Internal"
+        $response = try {
+            Invoke-WebRequest -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $intResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $intResponse"
+        if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
+        } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+        }
     }
 }
 
-# Function to check NZBHydra2
-function check_nzbhydra2() {
+# Function to check NZBHydra/NZBHydra2
+function check_nzbhydra() {
     $appPort='5076'
     $subDir='/nzbhydra/'
     $hcUUID=''
-    Write-Debug "NZBHydra External"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $extResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $extResponse"
-    Write-Debug "NZBHydra Internal"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $intResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $intResponse"
-    if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
-    } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
+    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+        Write-Debug "NZBHydra is paused"
+    } else {
+        Write-Debug "NZBHydra External"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $extResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $extResponse"
+        Write-Debug "NZBHydra Internal"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $intResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $intResponse"
+        if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
+        } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+        }
     }
 }
 
@@ -640,26 +705,31 @@ function check_ombi() {
     $appPort='3579'
     $subDir='/ombi/'
     $hcUUID=''
-    Write-Debug "Ombi External"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $extResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $extResponse"
-    Write-Debug "Ombi Internal"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $intResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $intResponse"
-    if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
-    } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
+    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+        Write-Debug "Ombi is paused"
+    } else {
+        Write-Debug "Ombi External"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $extResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $extResponse"
+        Write-Debug "Ombi Internal"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $intResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $intResponse"
+        if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
+        } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+        }
     }
 }
 
@@ -668,26 +738,31 @@ function check_pihole() {
     $subDomain='pihole'
     $subDir='/admin/'
     $hcUUID=''
-    Write-Debug "PiHole External"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "https://${subDomain}.${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $extResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $extResponse"
-    Write-Debug "PiHole Internal"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "http://${secondaryServerAddress}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $intResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $intResponse"
-    if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
-    } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
+    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+        Write-Debug "PiHole is paused"
+    } else {
+        Write-Debug "PiHole External"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "https://${subDomain}.${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $extResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $extResponse"
+        Write-Debug "PiHole Internal"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "http://${secondaryServerAddress}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $intResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $intResponse"
+        if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
+        } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+        }
     }
 }
 
@@ -696,26 +771,31 @@ function check_plex() {
     $appPort='32400'
     $subDir='/plex/'
     $hcUUID=''
-    Write-Debug "Plex External"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}web/index.html" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $extResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $extResponse"
-    Write-Debug "Plex Internal"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}/web/index.html" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $intResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $intResponse"
-    if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
-    } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
+    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+        Write-Debug "Plex is paused"
+    } else {
+        Write-Debug "Plex External"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}web/index.html" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $extResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $extResponse"
+        Write-Debug "Plex Internal"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}/web/index.html" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $intResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $intResponse"
+        if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
+        } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+        }
     }
 }
 
@@ -724,26 +804,31 @@ function check_portainer() {
     $appPort='9000'
     $subDir='/portainer/'
     $hcUUID=''
-    Write-Debug "Portainer External"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $extResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $extResponse"
-    Write-Debug "Portainer Internal"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $intResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $intResponse"
-    if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
-    } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
+    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+        Write-Debug "Portainer is paused"
+    } else {
+        Write-Debug "Portainer External"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $extResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $extResponse"
+        Write-Debug "Portainer Internal"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $intResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $intResponse"
+        if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
+        } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+        }
     }
 }
 
@@ -752,26 +837,31 @@ function check_radarr() {
     $appPort='7878'
     $subDir='/radarr/'
     $hcUUID=''
-    Write-Debug "Radarr External"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $extResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $extResponse"
-    Write-Debug "Radarr Internal"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $intResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $intResponse"
-    if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
-    } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
+    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+        Write-Debug "Radarr is paused"
+    } else {
+        Write-Debug "Radarr External"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $extResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $extResponse"
+        Write-Debug "Radarr Internal"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $intResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $intResponse"
+        if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
+        } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+        }
     }
 }
 
@@ -780,26 +870,31 @@ function check_rutorrent() {
     $appPort='9080'
     $subDir='/rutorrent/'
     $hcUUID=''
-    Write-Debug "ruTorrent External"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $extResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $extResponse"
-    Write-Debug "ruTorrent Internal"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $intResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $intResponse"
-    if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
-    } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
+    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+        Write-Debug "ruTorrent is paused"
+    } else {
+        Write-Debug "ruTorrent External"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $extResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $extResponse"
+        Write-Debug "ruTorrent Internal"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $intResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $intResponse"
+        if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
+        } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+        }
     }
 }
 
@@ -808,26 +903,31 @@ function check_sabnzbd() {
     $appPort='8580'
     $subDir='/sabnzbd/'
     $hcUUID=''
-    Write-Debug "SABnzbd External"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $extResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $extResponse"
-    Write-Debug "SABnzbd Internal"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $intResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $intResponse"
-    if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
-    } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
+    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+        Write-Debug "SABnzbd is paused"
+    } else {
+        Write-Debug "SABnzbd External"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $extResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $extResponse"
+        Write-Debug "SABnzbd Internal"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $intResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $intResponse"
+        if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
+        } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+        }
     }
 }
 
@@ -836,26 +936,31 @@ function check_sonarr() {
     $appPort='8989'
     $subDir='/sonarr/'
     $hcUUID=''
-    Write-Debug "Sonarr External"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $extResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $extResponse"
-    Write-Debug "Sonarr Internal"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $intResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $intResponse"
-    if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
-    } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
+    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+        Write-Debug "Sonarr is paused"
+    } else {
+        Write-Debug "Sonarr External"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $extResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $extResponse"
+        Write-Debug "Sonarr Internal"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $intResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $intResponse"
+        if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
+        } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+        }
     }
 }
 
@@ -864,26 +969,31 @@ function check_tautulli() {
     $appPort='8181'
     $subDir='/tautulli/auth/login'
     $hcUUID=''
-    Write-Debug "Tautulli External"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $extResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $extResponse"
-    Write-Debug "Tautulli Internal"
-    $response = try {
-        Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
-    } catch [System.Net.WebException] {
-        Write-Debug "An exception was caught: $($_.Exception.Message)"
-    }
-    $intResponse=[int]$response.BaseResponse.StatusCode
-    Write-Debug "Response: $intResponse"
-    if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
-    } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
-        (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
+    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+        Write-Debug "Tautulli is paused"
+    } else {
+        Write-Debug "Tautulli External"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "https://${domain}${subDir}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $extResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $extResponse"
+        Write-Debug "Tautulli Internal"
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $intResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $intResponse"
+        if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
+        } elseif (($extResponse -ne '200') -Or ($intResponse -ne '200')) {
+            (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}/fail";} -Retries 3) | Out-Null
+        }
     }
 }
 
@@ -897,28 +1007,28 @@ function main() {
         get_checks
         unpause_checks
     } elseif ($option -eq "ping") {
-        #check_organizr
-        #check_bitwarden
-        #check_deluge
-        #check_gitlab
-        #check_grafana
-        #check_guacamole
-        #check_jackett
-        #check_library
+        check_organizr
+        check_bitwarden
+        check_deluge
+        check_gitlab
+        check_grafana
+        check_guacamole
+        check_jackett
+        check_library
         check_lidarr
-        #check_logarr
-        #check_monitorr
-        #check_nzbget
-        #check_nzbhydra2
-        #check_ombi
-        #check_pihole
-        #check_plex
-        #check_portainer
-        #check_radarr
-        #check_rutorrent
-        #check_sabnzbd
-        #check_sonarr
-        #check_tautulli
+        check_logarr
+        check_monitorr
+        check_nzbget
+        check_nzbhydra
+        check_ombi
+        check_pihole
+        check_plex
+        check_portainer
+        check_radarr
+        check_rutorrent
+        check_sabnzbd
+        check_sonarr
+        check_tautulli
     }
 }
 
