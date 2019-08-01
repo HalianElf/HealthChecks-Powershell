@@ -276,6 +276,14 @@ function send_webhook() {
     }
 }
 
+# Function to check for the existance of the overall lock file
+function check_lock_file() {
+    if (Test-Path "${lockfileDir}healthchecks.lock" -PathType Leaf) {
+        Write-Information "Skipping checks due to lock file being present."
+        exit 0
+    }
+}
+
 # Function to check Organizr public Domain
 function check_organizr() {
     $appPort='4080'
@@ -1230,6 +1238,7 @@ function main() {
         get_checks
         unpause_checks
     } elseif ($option -eq "ping") {
+        check_lock_file
         check_organizr
         check_bitwarden
         check_deluge
