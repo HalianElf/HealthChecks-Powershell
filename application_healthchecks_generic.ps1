@@ -166,7 +166,7 @@ function check_api_key() {
             $hcAPIKey=$ans
         } else {
             try {
-                Invoke-WebRequest -Headers @{"X-Api-Key"="$hcAPIKey";} -Uri "${hcAPIDomain}checks/"
+                Invoke-WebRequest -Headers @{"X-Api-Key"="$hcAPIKey";} -Uri "${hcAPIDomain}checks/" | Out-Null
                 (Get-Content $MyInvocation.ScriptName) -replace "^    \`$apiKeyValid = \`$false", '    $apiKeyValid = $true' | Set-Content $MyInvocation.ScriptName
                 $apiKeyValid = $true
             } catch {
@@ -205,12 +205,12 @@ function pause_checks() {
         foreach ($check in $checks.checks) {
             Write-Information "Pausing $($check.name)"
             try { 
-                Invoke-WebRequest -Method POST -Headers @{"X-Api-Key"="$hcAPIKey";} -Uri $check.pause_url  | Out-Null
+                Invoke-WebRequest -Method POST -Headers @{"X-Api-Key"="$hcAPIKey";} -Uri $check.pause_url | Out-Null
             } catch {
                 Write-ColorOutput -ForegroundColor red -MessageData "Something went wrong when pausing $($check.name)!"
             }
         }
-        New-Item -Path "${lockfileDir}healthchecks.lock" -ItemType File  | Out-Null
+        New-Item -Path "${lockfileDir}healthchecks.lock" -ItemType File | Out-Null
     } else {
         if (-Not ($checks.checks.name -contains $pause)) {
             Write-ColorOutput -ForegroundColor red -MessageData "Please make sure you're specifying a valid check and try again."
@@ -218,11 +218,11 @@ function pause_checks() {
             $check = $checks.checks.Where({$_.name -eq $pause})
             Write-Information "Pausing $($check.name)"
             try { 
-                Invoke-WebRequest -Method POST -Headers @{"X-Api-Key"="$hcAPIKey";} -Uri $check.pause_url  | Out-Null
+                Invoke-WebRequest -Method POST -Headers @{"X-Api-Key"="$hcAPIKey";} -Uri $check.pause_url | Out-Null
             } catch {
                 Write-ColorOutput -ForegroundColor red -MessageData "Something went wrong when pausing $($check.name)!"
             }
-            New-Item -Path "${lockfileDir}$($check.name).lock" -ItemType File  | Out-Null
+            New-Item -Path "${lockfileDir}$($check.name).lock" -ItemType File | Out-Null
         }
     }
 }
@@ -232,12 +232,12 @@ function unpause_checks() {
         foreach ($check in $checks.checks) {
             Write-Information "Unpausing $($check.name) by sending a ping"
             try { 
-                Invoke-WebRequest -Uri $check.ping_url  | Out-Null
+                Invoke-WebRequest -Uri $check.ping_url | Out-Null
             } catch {
                 Write-ColorOutput -ForegroundColor red -MessageData "Something went wrong when pinging $($check.name)!"
             }
         }
-        Remove-Item -Path "${lockfileDir}healthchecks.lock"  | Out-Null
+        Remove-Item -Path "${lockfileDir}healthchecks.lock" | Out-Null
     } else {
         if (-Not ($checks.checks.name -contains $unpause)) {
             Write-ColorOutput -ForegroundColor red -MessageData "Please make sure you're specifying a valid check and try again."
@@ -245,11 +245,11 @@ function unpause_checks() {
             $check = $checks.checks.Where({$_.name -eq $unpause})
             Write-Information "Unpausing $($check.name) by sending a ping"
             try { 
-                Invoke-WebRequest -Uri $check.ping_url  | Out-Null
+                Invoke-WebRequest -Uri $check.ping_url | Out-Null
             } catch {
                 Write-ColorOutput -ForegroundColor red -MessageData "Something went wrong when pinging $($check.name)!"
             }
-            Remove-Item -Path "${lockfileDir}$($check.name).lock"  | Out-Null
+            Remove-Item -Path "${lockfileDir}$($check.name).lock" | Out-Null
         }
     }
 }
