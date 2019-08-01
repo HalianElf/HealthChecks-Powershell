@@ -1026,28 +1026,28 @@ function main() {
         get_checks
         unpause_checks
     } elseif ($option -eq "ping") {
-        #check_organizr
-        #check_bitwarden
-        #check_deluge
-        #check_gitlab
-        #check_grafana
-        #check_guacamole
-        #check_jackett
-        #check_library
-        #check_lidarr
-        #check_logarr
-        #check_monitorr
-        #check_nzbget
-        #check_nzbhydra
-        #check_ombi
-        #check_pihole
-        #check_plex
-        #check_portainer
-        #check_radarr
-        #check_rutorrent
-        #check_sabnzbd
-        #check_sonarr
-        #check_tautulli
+        check_organizr
+        check_bitwarden
+        check_deluge
+        check_gitlab
+        check_grafana
+        check_guacamole
+        check_jackett
+        check_library
+        check_lidarr
+        check_logarr
+        check_monitorr
+        check_nzbget
+        check_nzbhydra
+        check_ombi
+        check_pihole
+        check_plex
+        check_portainer
+        check_radarr
+        check_rutorrent
+        check_sabnzbd
+        check_sonarr
+        check_tautulli
     }
     if ($webhook) {
         get_checks
