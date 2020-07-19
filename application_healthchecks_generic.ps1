@@ -225,7 +225,9 @@ function pause_checks() {
                 } catch {
                     Write-ColorOutput -ForegroundColor red -MessageData "Something went wrong when pausing $($check.name)!"
                 }
-                New-Item -Path "${lockfileDir}$($check.name).lock" -ItemType File | Out-Null
+                $splitUrl = $check.update_url.Split("/")
+                $uuid = $splitUrl[6]
+                New-Item -Path "${lockfileDir}${uuid}.lock" -ItemType File | Out-Null
             }
         }
     }
@@ -254,7 +256,9 @@ function unpause_checks() {
                 } catch {
                     Write-ColorOutput -ForegroundColor red -MessageData "Something went wrong when pinging $($check.name)!"
                 }
-                Remove-Item -Path "${lockfileDir}$($check.name).lock" | Out-Null
+                $splitUrl = $check.update_url.Split("/")
+                $uuid = $splitUrl[6]
+                Remove-Item -Path "${lockfileDir}${uuid}.lock" | Out-Null
             }
         }
     }
@@ -290,8 +294,8 @@ function check_lock_file() {
 function check_organizr() {
     $appPort='4080'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Organizr is paused"
     } else {
         Write-Debug "Organizr External"
@@ -331,8 +335,8 @@ function check_bazarr() {
     $appPort='6767'
     $subDir='/bazarr/series'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Bazarr is paused"
     } else {
         Write-Debug "Bazarr External"
@@ -372,8 +376,8 @@ function check_bitwarden() {
     $subDomain='bitwarden'
     $appPort='8484'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Bitwarden is paused"
     } else {
         Write-Debug "Bitwarden External"
@@ -413,8 +417,8 @@ function check_chevereto() {
     $subDomain='gallery'
     $appPort='9292'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Chevereto is paused"
     } else {
         Write-Debug "Chevereto External"
@@ -454,8 +458,8 @@ function check_deluge() {
     $appPort='8112'
     $subDir='/deluge/'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Deluge is paused"
     } else {
         Write-Debug "Guacamole External"
@@ -495,8 +499,8 @@ function check_filebrowser() {
     $subDomain='files'
     $appPort='8585'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Filebrowser is paused"
     } else {
         Write-Debug "Filebrowser External"
@@ -537,8 +541,8 @@ function check_gitlab() {
     $appPort='8081'
     $subDir='/users/sign_in'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Gitlab is paused"
     } else {
         Write-Debug "Gitlab External"
@@ -578,8 +582,8 @@ function check_grafana() {
     $subDomain='grafana'
     $appPort='3000'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Grafana is paused"
     } else {
         Write-Debug "Grafana External"
@@ -619,8 +623,8 @@ function check_guacamole() {
     $appPort=''
     $subDir='/guac/'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Guacamole is paused"
     } else {
         Write-Debug "Guacamole External"
@@ -660,8 +664,8 @@ function check_jackett() {
     $appPort='9117'
     $subDir='/jackett/UI/Login'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Jackett is paused"
     } else {
         Write-Debug "Jackett External"
@@ -701,8 +705,8 @@ function check_library() {
     $subDomain='library'
     $appPort='8383'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "PLPP is paused"
     } else {
         Write-Debug "PLPP External"
@@ -742,8 +746,8 @@ function check_lidarr() {
     $appPort='8686'
     $subDir='/lidarr/'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Lidarr is paused"
     } else {
         Write-Debug "Lidarr External"
@@ -783,8 +787,8 @@ function check_logarr() {
     $appPort='8000'
     $subDir='/logarr/'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Logarr is paused"
     } else {
         Write-Debug "Logarr External"
@@ -824,8 +828,8 @@ function check_thelounge() {
     $appPort='9090'
     $subDir='/thelounge/'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "TheLounge is paused"
     } else {
         Write-Debug "TheLounge External"
@@ -865,8 +869,8 @@ function check_mediabutler() {
     $appPort='9876'
     $subDir='/mediabutler/'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "MediaButler is paused"
     } else {
         Write-Debug "MediaButler External"
@@ -906,8 +910,8 @@ function check_monitorr() {
     $appPort='8001'
     $subDir='/monitorr/'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Monitorr is paused"
     } else {
         Write-Debug "Monitorr External"
@@ -948,16 +952,29 @@ function check_nagios() {
     $appPort='8787'
     $subDir=''
     $nagUser=''
-    $nagPass=ConvertTo-SecureString '' -AsPlainText -Force
+    $nagPass=''
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    $credential = New-Object System.Management.Automation.PSCredential($nagUser, $nagPass)
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    $encoded = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes("${nagUser}:${nagPass}"))
+    $headers = @{
+        "Authorization" = "Basic $encoded"
+    }
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Nagios is paused"
     } else {
-        Write-Debug "Nagios External"
+        Write-Debug "Nagios Internal"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "https://${subdomain}.${domain}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore -Credential $credential
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -Headers $headers -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
+        } catch [System.Net.WebException] {
+            Write-Debug "An exception was caught: $($_.Exception.Message)"
+        }
+        $intResponse=[int]$response.BaseResponse.StatusCode
+        Write-Debug "Response: $intResponse"
+
+        Write-Debug "Nagios External"
+        $headers.Add("token", $orgAPIKey)
+        $response = try {
+            Invoke-WebRequest -Method HEAD -Uri "https://${subdomain}.${domain}${subDir}" -Header $headers -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
@@ -967,14 +984,6 @@ function check_nagios() {
             $loc = $response.Headers.Location
             Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
         }
-        Write-Debug "Nagios Internal"
-        $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
-        } catch [System.Net.WebException] {
-            Write-Debug "An exception was caught: $($_.Exception.Message)"
-        }
-        $intResponse=[int]$response.BaseResponse.StatusCode
-        Write-Debug "Response: $intResponse"
         if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
             $loc = $response.Headers.Location
             Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
@@ -992,8 +1001,8 @@ function check_netdata() {
     $appPort='9999'
     $subDir='/netdata/'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Netdata is paused"
     } else {
         Write-Debug "Netdata External"
@@ -1033,8 +1042,8 @@ function check_nextcloud() {
     $subDomain='nextcloud'
     $appPort='9393'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Filebrowser is paused"
     } else {
         Write-Debug "Filebrowser External"
@@ -1074,8 +1083,8 @@ function check_nzbget() {
     $appPort='6789'
     $subDir='/nzbget/'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "NZBGet is paused"
     } else {
         Write-Debug "NZBGet External"
@@ -1115,8 +1124,8 @@ function check_nzbhydra() {
     $appPort='5076'
     $subDir='/nzbhydra/'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "NZBHydra is paused"
     } else {
         Write-Debug "NZBHydra External"
@@ -1156,8 +1165,8 @@ function check_ombi() {
     $appPort='3579'
     $subDir='/ombi/'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Ombi is paused"
     } else {
         Write-Debug "Ombi External"
@@ -1197,8 +1206,8 @@ function check_pihole() {
     $subDomain='pihole'
     $subDir='/admin/'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "PiHole is paused"
     } else {
         Write-Debug "PiHole External"
@@ -1238,8 +1247,8 @@ function check_plex() {
     $appPort='32400'
     $subDir='/plex/'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Plex is paused"
     } else {
         Write-Debug "Plex External"
@@ -1279,8 +1288,8 @@ function check_portainer() {
     $appPort='9000'
     $subDir='/portainer/'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Portainer is paused"
     } else {
         Write-Debug "Portainer External"
@@ -1320,8 +1329,8 @@ function check_radarr() {
     $appPort='7878'
     $subDir='/radarr/'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Radarr is paused"
     } else {
         Write-Debug "Radarr External"
@@ -1361,23 +1370,22 @@ function check_radarr() {
 function check_readynas() {
     $subDir='/admin/'
     $rNASUser=''
-    $rNASPass=ConvertTo-SecureString '' -AsPlainText -Force
+    $rNASPass=''
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    $credential = New-Object System.Management.Automation.PSCredential($rNASUser, $rNASPass)
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    $encoded = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes("${rNASUser}:${rNASPass}"))
+    $headers = @{
+        "Authorization" = "Basic $encoded"
+    }
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "ReadyNAS is paused"
     } else {
         Write-Debug "ReadyNAS External"
         $extResponse=200
         Write-Debug "Response: $extResponse"
-        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
-            $loc = $response.Headers.Location
-            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
-        }
         Write-Debug "ReadyNAS Internal"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore -Credential $credential
+            Invoke-WebRequest -Method HEAD -Uri "http://${primaryServerAddress}:${appPort}${subDir}" -Headers $headers -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore -Credential $credential
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
@@ -1400,8 +1408,8 @@ function check_rutorrent() {
     $appPort='9080'
     $subDir='/rutorrent/'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "ruTorrent is paused"
     } else {
         Write-Debug "ruTorrent External"
@@ -1441,8 +1449,8 @@ function check_sabnzbd() {
     $appPort='8580'
     $subDir='/sabnzbd/'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "SABnzbd is paused"
     } else {
         Write-Debug "SABnzbd External"
@@ -1482,8 +1490,8 @@ function check_sonarr() {
     $appPort='8989'
     $subDir='/sonarr/'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Sonarr is paused"
     } else {
         Write-Debug "Sonarr External"
@@ -1523,8 +1531,8 @@ function check_tautulli() {
     $appPort='8181'
     $subDir='/tautulli/status'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Tautulli is paused"
     } else {
         Write-Debug "Tautulli External"
@@ -1564,8 +1572,8 @@ function check_transmission() {
     $appPort='9091'
     $subDir='/transmission/web/index.html'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Transmission is paused"
     } else {
         Write-Debug "Transmission External"
@@ -1606,8 +1614,8 @@ function check_unifi_controller() {
     $appPort='8443'
     $subDir='/manage/account/login'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Unifi Controller is paused"
     } else {
         Write-Debug "Unifi Controller External"
@@ -1647,8 +1655,8 @@ function check_unifi_protect() {
     $subDomain='nvr'
     $appPort='7443'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Unifi Protect is paused"
     } else {
         Write-Debug "Unifi Protect External"
@@ -1687,17 +1695,13 @@ function check_unifi_protect() {
 # No external check because you should not reverse proxy your Unraid
 function check_unraid() {
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "Unraid is paused"
     } else {
         Write-Debug "Unraid External"
         $extResponse=200
         Write-Debug "Response: $extResponse"
-        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
-            $loc = $response.Headers.Location
-            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
-        }
         Write-Debug "Unraid Internal"
         $response = try {
             Invoke-WebRequest -Method HEAD -Uri "http://${unraidServerAddress}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
@@ -1722,17 +1726,13 @@ function check_unraid() {
 # No external check because you should not reverse proxy your vCenter
 function check_vcenter() {
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "vCenter is paused"
     } else {
         Write-Debug "vCenter External"
         $extResponse=200
         Write-Debug "Response: $extResponse"
-        if(($extResponse -eq 301) -Or ($extResponse -eq 302)) {
-            $loc = $response.Headers.Location
-            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
-        }
         Write-Debug "vCenter Internal"
         $response = try {
             Invoke-WebRequest -Method HEAD -Uri "http://${vCenterServerAddress}" -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
@@ -1759,13 +1759,13 @@ function check_vcenter() {
 function check_xbackbone() {
     $subDomain='sharex'
     $hcUUID=''
-    $appLockFile = "$(([string]$MyInvocation.MyCommand).Substring(6)).lock"
-    if (Test-Path "${lockfileDir}${appLockFile}" -PathType Leaf) {
+    Write-Debug "========================================="
+    if (Test-Path "${lockfileDir}${hcUUID}.lock" -PathType Leaf) {
         Write-Debug "XBackBone is paused"
     } else {
         Write-Debug "XBackBone External"
         $response = try {
-            Invoke-WebRequest -Method HEAD -Uri "https://${subdomain}.${domain}" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
+            Invoke-WebRequest -Method HEAD -Uri "https://${subdomain}.${domain}/login" -Headers @{"token"="$orgAPIKey";} -TimeoutSec 10 -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore
         } catch [System.Net.WebException] {
             Write-Debug "An exception was caught: $($_.Exception.Message)"
         }
@@ -1777,10 +1777,6 @@ function check_xbackbone() {
         }
         Write-Debug "xBackBone Internal"
         $intResponse=200
-        if(($intResponse -eq 301) -Or ($intResponse -eq 302)) {
-            $loc = $response.Headers.Location
-            Write-Debug "Maximum Redirect Exceeded, New URL: $loc"
-        }
         Write-Debug "Response: $intResponse"
         if (($extResponse -eq '200') -And ($intResponse -eq '200')) {
             (WebRequestRetry -Params @{Uri="${hcPingDomain}${hcUUID}";} -Retries 3) | Out-Null
