@@ -17,9 +17,30 @@ Please be warned that by default, Windows Policies are to block any and all scri
 
 Now that you have it so that everything is working properly, you can use Task Scheduler to have it run automatically. When adding a new task, set the action to `Start a program`, choose `Powershell.exe` as the Program/script and use `-ExecutionPolicy RemoteSigned -File C:\Path\To\Script\application_healthchecks_generic.ps1` in the arguments. (Note: if you set the Execution Policy permanently, you won't need the `-ExecutionPolicy` flag)
 
+## Pausing/Unpausing Checks
+
+If you are doing some maintenenance, you can pause/unpause all checks using `all` or an individual check by name. Pausing is done with `-pause` or `-p` and unpausing is done with `-unpause` or `-u`
+
+Examples:
+
+Pause all checks: `.\application_healthchecks_generic.ps1 -pause all`
+
+Unpause all checks: `.\application_healthchecks_generic.ps1 -unpause all`
+
+Pause a specific check: `.\application_healthchecks_generic.ps1 -p organizr`
+
+Unpause a specific check: `.\application_healthchecks_generic.ps1 -u organizr`
+
+## Discord alert for paused monitors
+
+Using the `-webhook` or `-w` option will check for any paused monitors and, if there are any, send an alert to the specified Discord/Slack webhook like below:
+
+![Discord/Slack Notification](/Images/webhook_paused.png)
+![Discord/Slack Notification](/Images/webhook_nopaused.png)
+
 ## Thanks
 
-Big thanks to [christronyxyocum](https://github.com/christronyxyocum) for creating the bash script that this is based off of.
+Big thanks to [christronyxyocum](https://github.com/christronyxyocum) for creating the bash scripts that this is based off of.
 
 ## Questions
 
