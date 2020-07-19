@@ -7,7 +7,35 @@ Script to test various application reverse proxies, as well as their internal pa
 
 ## Setting it up
 
-There are variables at the top that are used throughout the script to do the tests. You'll want to fill in your domain, Organizr API key, and server IP(s). If you are self-hosting Healthchecks, you can change the hcPingDomain variable. You'll also need to go to each of the `check_application` functions and edit the UUID for the Healthcheck and the ports and/or subdomains on those. Lastly, comment out any of the checks you don't need in the main function.
+There are variables at the top that are used throughout the script to do the tests. You'll want to fill in your domain, Organizr API key, and server IP(s). If you are self-hosting Healthchecks, you can change the hcPingDomain variable. I have included sample `check_app` functions but you will need to edit the UUID for the Healthcheck and the ports and/or subdomains on those.
+
+Flags you can use on `check_app`:
+
+`-appName` - Friendly name for the check (will show in the Debug output)
+
+`-subDir` - Subdirectory for the check
+
+`-intSubDir` - Internal subdirectory for the check, used to override the path on the internal check
+
+`-subDomain` - Subdomain for the external check
+
+`-intServer` - Name of the server the internal check should use, Pulls the IP address from the `nameServerAddress` variable, defaults to `primary`
+
+`-appPort` - Port to check for the application, defaults to `80` (switches to `443` if you use the `internal_ssl` switch)
+
+`-hcUUID` - Healthchecks UUID for the check
+
+`-username` - Username for Basic Auth
+
+`-password` - Password for Basic Auth
+
+`-disabled` - Disable a check, can be either `int` to disable the internal check or `ext` to disable the external check
+
+`-internal_ssl` - uses `https` for the internal check
+
+`-follow` - follows redirects, by default checks will not follow redirects
+
+`-head` - disable the `HEAD` check and use `GET` instead
 
 Once you have all of the checks configured as you need, you can run the script with the `-DebugOn` flag to make sure that all the responses are returning what's expected.
 
