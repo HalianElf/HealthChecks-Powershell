@@ -24,8 +24,11 @@ If you are doing some maintenenance, you can pause/unpause all checks using `all
 Examples:
 
 Pause all checks: `.\application_healthchecks_generic.ps1 -pause all`
+
 Unpause all checks: `.\application_healthchecks_generic.ps1 -unpause all`
+
 Pause a specific check: `.\application_healthchecks_generic.ps1 -p organizr`
+
 Unpause a specific check: `.\application_healthchecks_generic.ps1 -u organizr`
 
 ## Discord alert for paused monitors
