@@ -22,6 +22,7 @@ Now that you have it so that everything is working properly, you can use Task Sc
 If you are doing some maintenenance, you can pause/unpause all checks using `all` or an individual check by name. Pausing is done with `-pause` or `-p` and unpausing is done with `-unpause` or `-u`
 
 Examples:
+
 Pause all checks: `.\application_healthchecks_generic.ps1 -pause all`
 Unpause all checks: `.\application_healthchecks_generic.ps1 -unpause all`
 Pause a specific check: `.\application_healthchecks_generic.ps1 -p organizr`
@@ -31,6 +32,8 @@ Unpause a specific check: `.\application_healthchecks_generic.ps1 -u organizr`
 
 Using the `-webhook` or `-w` option will check for any paused monitors and, if there are any, send an alert to the specified Discord/Slack webhook like below:
 
+![Discord/Slack Notification](/Images/webhook_paused.png)
+![Discord/Slack Notification](/Images/webhook_nopaused.png)
 
 ## Thanks
 
