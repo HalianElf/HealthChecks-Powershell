@@ -95,7 +95,7 @@ function WebRequestRetry() {
         try {
             $response = Invoke-WebRequest @Params -UseBasicParsing
             if ($response.StatusCode -ne 200) {
-                throw "Expecting reponse code 200, was: $($response.StatusCode)"
+                throw "Expecting response code 200, was: $($response.StatusCode)"
             }
             $completed = $true
         } catch {
@@ -282,7 +282,7 @@ function send_webhook() {
     }
 }
 
-# Function to check for the existance of the overall lock file
+# Function to check for the existence of the overall lock file
 function check_lock_file() {
     if (Test-Path "${lockfileDir}healthchecks.lock" -PathType Leaf) {
         Write-Information "Skipping checks due to lock file being present."
